@@ -19,7 +19,7 @@ public class MyPipelineStack extends Stack {
         CodePipeline pipeline = CodePipeline.Builder.create(this, "pipeline")
                 .pipelineName("MyPipeline")
                 .synth(ShellStep.Builder.create("Synth")
-                               .input(CodePipelineSource.gitHub("OWNER/REPO", "main"))
+                               .input(CodePipelineSource.gitHub("zierg/test-aws-pipeliine", "main"))
                                .commands(Arrays.asList("npm install -g aws-cdk", "cdk synth"))
                                .build())
                 .build();
