@@ -5,6 +5,7 @@ import software.amazon.awscdk.Environment;
 import software.amazon.awscdk.StackProps;
 
 public class MyPipelineApp {
+    //TODO: remove
     public static void main(final String[] args) {
         App app = new App();
 
