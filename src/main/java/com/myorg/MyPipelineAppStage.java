@@ -1,5 +1,6 @@
 package com.myorg;
 
+import com.myorg.lambda.MyPipelineLambdaStack;
 import software.constructs.Construct;
 import software.amazon.awscdk.Stack;
 import software.amazon.awscdk.Stage;

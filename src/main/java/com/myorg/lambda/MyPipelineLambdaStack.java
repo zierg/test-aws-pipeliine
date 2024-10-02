@@ -1,4 +1,4 @@
-package com.myorg;
+package com.myorg.lambda;
 
 import software.constructs.Construct;
 import software.amazon.awscdk.Stack;
@@ -15,8 +15,6 @@ public class MyPipelineLambdaStack extends Stack {
 
     public MyPipelineLambdaStack(final Construct scope, final String id, final StackProps props) {
         super(scope, id, props);
-
-        // TODO: remove
 
         Function.Builder.create(this, "LambdaFunction")
                 .runtime(Runtime.NODEJS_18_X)
