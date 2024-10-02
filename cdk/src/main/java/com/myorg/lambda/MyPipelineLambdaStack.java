@@ -7,7 +7,6 @@ import software.amazon.awscdk.StackProps;
 
 import software.amazon.awscdk.services.lambda.Function;
 import software.amazon.awscdk.services.lambda.Runtime;
-import software.amazon.awscdk.services.lambda.InlineCode;
 
 public class MyPipelineLambdaStack extends Stack {
     public MyPipelineLambdaStack(final Construct scope, final String id) {
@@ -18,7 +17,7 @@ public class MyPipelineLambdaStack extends Stack {
         super(scope, id, props);
 
         Function.Builder.create(this, "LambdaFunction")
-                .runtime(Runtime.JAVA_21)
+                .runtime(Runtime.JAVA_17)
                 .handler("com.myorg.codelambda.MyLambdaHandler::handleRequest")
                 .code(Code.fromAsset("./lambda/target/lambda-0.1.jar"))
                 .build();
