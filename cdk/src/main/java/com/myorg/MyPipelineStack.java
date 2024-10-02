@@ -40,12 +40,12 @@ public class MyPipelineStack extends Stack {
                 )
         );
 
-        Project buildLambdas = Project.Builder.create(this, "BuildLambdas")
+        Project buildLambdas = Project.Builder.create(this, "BuildLambdasProject")
                 .buildSpec(BuildSpec.fromObject(buildSpec))
                 .build();
 
         BuildLambdasStage buildLambdasStage = new BuildLambdasStage(
-                this, "BuildLambdas",
+                this, "BuildLambdasStage",
                 StageProps.builder()
                 .env(Environment.builder()
                              .account("266735842067")

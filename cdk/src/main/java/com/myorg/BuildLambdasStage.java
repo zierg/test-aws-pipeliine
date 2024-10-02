@@ -20,7 +20,7 @@ public class BuildLambdasStage extends Stage {
         this.output = output;
 
         CodeBuildAction.Builder.create()
-                .actionName("BuildLambdas")
+                .actionName("BuildLambdasAction")
                 .input(input)
                 .outputs(List.of(output))
                 .project(buildLambdasProject)
