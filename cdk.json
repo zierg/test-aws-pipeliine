@@ -1,5 +1,5 @@
 {
-  "app": "mvn -e -q compile && mvn -e exec:java",
+  "app": "mvn -e compile && mvn -pl lambda -e package && mvn -pl cdk -e exec:java",
   "watch": {
     "include": [
       "**"
