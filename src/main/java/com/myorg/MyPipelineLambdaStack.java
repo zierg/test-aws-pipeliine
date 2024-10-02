@@ -16,6 +16,8 @@ public class MyPipelineLambdaStack extends Stack {
     public MyPipelineLambdaStack(final Construct scope, final String id, final StackProps props) {
         super(scope, id, props);
 
+        // TODO: remove
+
         Function.Builder.create(this, "LambdaFunction")
                 .runtime(Runtime.NODEJS_18_X)
                 .handler("index.handler")
