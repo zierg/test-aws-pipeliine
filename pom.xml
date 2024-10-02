@@ -14,6 +14,9 @@
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+
+<!--        To make builds reproducible  -->
+<!--        https://maven.apache.org/guides/mini/guide-reproducible-builds.html  -->
         <project.build.outputTimestamp>2023-01-01T00:00:00Z</project.build.outputTimestamp>
     </properties>
 
@@ -21,6 +24,7 @@
         <pluginManagement>
             <plugins>
                 <plugin>
+<!--                Goes to children. Needed to make {project.build.outputTimestamp} property apply  -->
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-jar-plugin</artifactId>
                     <version>3.2.0</version>

@@ -1,7 +1,5 @@
 package com.myorg;
 
-import java.util.Arrays;
-import software.constructs.Construct;
 import software.amazon.awscdk.Environment;
 import software.amazon.awscdk.Stack;
 import software.amazon.awscdk.StackProps;
@@ -9,8 +7,14 @@ import software.amazon.awscdk.StageProps;
 import software.amazon.awscdk.pipelines.CodePipeline;
 import software.amazon.awscdk.pipelines.CodePipelineSource;
 import software.amazon.awscdk.pipelines.ShellStep;
+import software.amazon.awscdk.pipelines.StageDeployment;
+import software.constructs.Construct;
+
+import java.util.Arrays;
+import java.util.List;
 
 public class MyPipelineStack extends Stack {
+    @SuppressWarnings("unused")
     public MyPipelineStack(final Construct scope, final String id) {
         this(scope, id, null);
     }
@@ -26,11 +30,28 @@ public class MyPipelineStack extends Stack {
                                .build())
                 .build();
 
-        pipeline.addStage(new MyPipelineAppStage(this, "natosha", StageProps.builder()
+        BuildLambdasStage buildLambdasStage = new BuildLambdasStage(this, "BuildLambdas", StageProps.builder()
                 .env(Environment.builder()
                              .account("266735842067")
                              .region("eu-west-1")
                              .build())
-                .build()));
+                .build());
+
+        pipeline.addStage(buildLambdasStage);
+
+
+        pipeline.addStage(new MyPipelineAppStage(
+                this,
+                "natosha",
+                StageProps.builder()
+                        .env(Environment.builder()
+                             .account("266735842067")
+                             .region("eu-west-1")
+                             .build())
+                        .build(),
+                List.of(buildLambdasStage.getOutput())
+                                                    )
+
+        );
     }
 }
