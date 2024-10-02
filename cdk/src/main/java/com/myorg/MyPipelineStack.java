@@ -7,11 +7,13 @@ import software.amazon.awscdk.StageProps;
 import software.amazon.awscdk.pipelines.CodePipeline;
 import software.amazon.awscdk.pipelines.CodePipelineSource;
 import software.amazon.awscdk.pipelines.ShellStep;
-import software.amazon.awscdk.pipelines.StageDeployment;
+import software.amazon.awscdk.services.codebuild.BuildSpec;
+import software.amazon.awscdk.services.codebuild.Project;
 import software.constructs.Construct;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 
 public class MyPipelineStack extends Stack {
     @SuppressWarnings("unused")
@@ -30,12 +32,28 @@ public class MyPipelineStack extends Stack {
                                .build())
                 .build();
 
-        BuildLambdasStage buildLambdasStage = new BuildLambdasStage(this, "BuildLambdas", StageProps.builder()
+        Map<String, ?> buildSpec = Map.of(
+                "phases", Map.of(
+                        "build", Map.of(
+                                "commands", List.of("mvn -pl lambda package")
+                        )
+                )
+        );
+
+        Project buildLambdas = Project.Builder.create(this, "BuildLambdas")
+                .buildSpec(BuildSpec.fromObject(buildSpec))
+                .build();
+
+        BuildLambdasStage buildLambdasStage = new BuildLambdasStage(
+                this, "BuildLambdas",
+                StageProps.builder()
                 .env(Environment.builder()
                              .account("266735842067")
                              .region("eu-west-1")
                              .build())
-                .build());
+                .build(),
+                buildLambdas
+        );
 
         pipeline.addStage(buildLambdasStage);
 
