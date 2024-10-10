@@ -7,7 +7,7 @@ terraform {
 }
 
 resource "aws_s3_bucket" "application_pipeline_artifacts" {
-  bucket_prefix = "my-pipeline-artifacts-bucket"
+  bucket_prefix = "application-pipeline-artifacts-bucket"
   acl    = "private"
 }
 
