@@ -47,7 +47,7 @@ resource "aws_iam_role_policy_attachment" "codepipeline_policy_attach" {
 }
 
 resource "aws_codepipeline" "application_pipeline" {
-  name     = "terraform-pipeline"
+  name     = "application-terraform-pipeline"
   role_arn = aws_iam_role.application_codepipeline_role.arn
 
   artifact_store {
