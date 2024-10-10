@@ -6,45 +6,71 @@ terraform {
   }
 }
 
-data "aws_iam_policy_document" "assume_role" {
-  statement {
-    effect = "Allow"
+resource "aws_s3_bucket" "application_pipeline_artifacts" {
+  bucket_prefix = "my-pipeline-artifacts-bucket"
+  acl    = "private"
+}
 
-    principals {
-      type        = "Service"
-      identifiers = ["lambda.amazonaws.com"]
-    }
+resource "aws_codestarconnections_connection" "application_github_connection" {
+  name          = "application-example-connection"
+  provider_type = "GitHub"
+}
 
-    actions = ["sts:AssumeRole"]
+resource "aws_iam_role" "application_codepipeline_role" {
+  name = "application-codepipeline-role"
+
+  assume_role_policy = jsonencode({
+    Version = "2012-10-17",
+    Statement = [
+      {
+        Effect = "Allow",
+        Principal = {
+          Service = "codepipeline.amazonaws.com"
+        },
+        Action = "sts:AssumeRole"
+      }
+    ]
+  })
+}
+
+module "codepipeline_policy" {
+  source = "./codepipeline_policy"
+
+  pipeline_artifacts_s3_bucket_arn = aws_s3_bucket.application_pipeline_artifacts.arn
+  #codebuild_project_name = aws_codebuild_project.terraform_build.name
+  github_codestar_connection_arn = aws_codestarconnections_connection.application_github_connection.arn
+}
+
+resource "aws_iam_role_policy_attachment" "codepipeline_policy_attach" {
+  role       = aws_iam_role.application_codepipeline_role.name
+  policy_arn = module.codepipeline_policy.policy_arn
+}
+
+resource "aws_codepipeline" "application_pipeline" {
+  name     = "terraform-pipeline"
+  role_arn = aws_iam_role.application_codepipeline_role.arn
+
+  artifact_store {
+    location = aws_s3_bucket.application_pipeline_artifacts.bucket
+    type     = "S3"
   }
-}
 
-resource "aws_iam_role" "iam_for_lambda" {
-  name               = "iam_for_lambda"
-  assume_role_policy = data.aws_iam_policy_document.assume_role.json
-}
+  stage {
+    name = "Source"
 
-data "archive_file" "lambda" {
-  type        = "zip"
-  source_file = "../lambda.js"
-  output_path = "lambda_function_payload.zip"
-}
+    action {
+      name             = "Source"
+      category         = "Source"
+      owner            = "AWS"
+      provider         = "CodeStarSourceConnection"
+      version          = "1"
+      output_artifacts = ["source_output"]
 
-resource "aws_lambda_function" "test_lambda" {
-  # If the file is not in the current working directory you will need to include a
-  # path.module in the filename.
-  filename      = "lambda_function_payload.zip"
-  function_name = "lambda_function_name"
-  role          = aws_iam_role.iam_for_lambda.arn
-  handler       = "index.handler"
-
-  source_code_hash = data.archive_file.lambda.output_base64sha256
-
-  runtime = "nodejs18.x"
-
-  environment {
-    variables = {
-      foo = "bar"
+      configuration = {
+        ConnectionArn    = aws_codestarconnections_connection.application_github_connection.arn
+        FullRepositoryId = "zierg/test-aws-pipeliine"
+        BranchName       = "main"
+      }
     }
   }
 }
