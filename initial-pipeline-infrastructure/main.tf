@@ -25,7 +25,7 @@ resource "aws_iam_role" "application_codepipeline_role" {
       {
         Effect = "Allow",
         Principal = {
-          Service = "codepipeline.amazonaws.com"
+          Service = ["codepipeline.amazonaws.com", "codebuild.amazonaws.com"]#todo
         },
         Action = "sts:AssumeRole"
       }
@@ -72,5 +72,56 @@ resource "aws_codepipeline" "application_pipeline" {
         BranchName       = "main"
       }
     }
+  }
+
+  stage {
+    name = "Deploy"
+
+    action {
+      version          = "1"
+      name             = "Terraform_Deploy"
+      category         = "Build"
+      owner            = "AWS"
+      provider         = "CodeBuild"
+      input_artifacts  = ["source_output"]
+
+      configuration = {
+        ProjectName = aws_codebuild_project.application_terraform_build.name
+      }
+    }
+  }
+}
+
+resource "aws_codebuild_project" "application_terraform_build" {
+  name          = "terraform-build"
+  service_role  = aws_iam_role.application_codepipeline_role.arn
+  build_timeout = 5
+  artifacts {
+    type = "CODEPIPELINE"
+  }
+
+  environment {
+    compute_type                = "BUILD_GENERAL1_SMALL"
+    image                       = "hashicorp/terraform:latest"
+    type                        = "LINUX_CONTAINER"
+    environment_variable {
+      name  = "TF_VAR_backend_bucket"
+      value = aws_s3_bucket.application_pipeline_artifacts.bucket
+    }
+  }
+
+  source {
+    type      = "CODEPIPELINE"
+    buildspec = <<EOF
+version: 0.2
+
+phases:
+  build:
+    commands:
+      - ls
+artifacts:
+  files:
+    - "**/*"
+EOF
   }
 }
