@@ -1,3 +1,11 @@
+terraform {
+  backend "s3" {
+    bucket = "ivkomi-evolution-board-game-bucket"
+    key    = "initial-pipeline-state"
+    region = "eu-west-1"
+  }
+}
+
 data "aws_iam_policy_document" "assume_role" {
   statement {
     effect = "Allow"
