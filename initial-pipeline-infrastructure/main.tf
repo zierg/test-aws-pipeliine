@@ -93,7 +93,7 @@ resource "aws_codepipeline" "application_pipeline" {
 }
 
 resource "aws_codebuild_project" "application_terraform_build" {
-  name          = "terraform-build"
+  name          = "application-terraform-build"
   service_role  = aws_iam_role.application_codepipeline_role.arn
   build_timeout = 5
   artifacts {
