@@ -3,7 +3,7 @@ data "aws_caller_identity" "current" {}
 data "aws_partition" "current" {}
 
 resource "aws_iam_policy" "codepipeline_policy" {
-  name        = "codepipeline-policy"
+  name        = "application-codepipeline-policy"
   description = "Policy for CodePipeline to access S3 and CodeBuild"
 
   policy = jsonencode({
